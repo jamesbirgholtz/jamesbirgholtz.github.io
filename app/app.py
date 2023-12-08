@@ -13,7 +13,7 @@ db = SQLAlchemy(app)
 # Setup for persistent login sessions across site/app
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = "home"
+login_manager.login_view = "index"
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -49,7 +49,7 @@ with app.app_context():
 def get_data():
     return app.send_static_file("data.json")
 @app.route('/', methods=['GET', 'POST'])
-def home():
+def index():
     form = LoginForm()
     # Check for user in db, if password matches, redirect to dashboard template
     if form.validate_on_submit():
@@ -57,7 +57,7 @@ def home():
         if user and user.password == form.password.data:
             login_user(user)
             return redirect(url_for('dashboard'))
-    return render_template("home.html", form=form)
+    return render_template("index.html", form=form)
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
@@ -72,7 +72,7 @@ def register():
                         dept=form.dept.data)
         db.session.add(new_user)
         db.session.commit()
-        return redirect(url_for('home'))
+        return redirect(url_for('index'))
 
     return render_template('register.html', form=form)
 @app.route('/dashboard', methods=['GET', 'POST'])
@@ -84,7 +84,7 @@ def dashboard():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('home'))
+    return redirect(url_for('index'))
 @app.route("/tickets", methods=['GET', 'POST'])
 @login_required
 def tickets():
